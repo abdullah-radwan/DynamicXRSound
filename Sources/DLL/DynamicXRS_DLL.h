@@ -5,7 +5,8 @@
 class DynamicXRS : public DynamicXRS_DLL
 {
 public:
-	DynamicXRS(VESSEL* vessel);
+	DynamicXRS(VESSEL* pVessel);
+	DynamicXRS(const char* pUniqueModuleName);
 	~DynamicXRS();
 
 	bool IsPresent() const override;
@@ -36,6 +37,8 @@ private:
 	XRSound* xrSound;
 };
 
-DLLCLBK DynamicXRS_DLL* CreateInstance(VESSEL* vessel) { return new DynamicXRS(vessel); }
+DLLCLBK DynamicXRS_DLL* CreateInstanceVessel(VESSEL* vessel) { return new DynamicXRS(vessel); }
+
+DLLCLBK DynamicXRS_DLL* CreateInstanceModule(const char* pUniqueModuleName) { return new DynamicXRS(pUniqueModuleName); }
 
 DLLCLBK void DestroyInstance(DynamicXRS_DLL* instance) { delete instance; }

@@ -1,11 +1,20 @@
 #include "DynamicXRSound.h"
-#include "DLL\DynamicXRS_Interface.h"
 
 #ifdef _DEBUG
 #define DLL_PATH "Modules\\DynamicXRSoundD.dll"
 #else
 #define DLL_PATH "Modules\\DynamicXRSound.dll"
 #endif
+
+XRSound* XRSound::CreateInstance(VESSEL* pVessel)
+{
+	return new DynamicXRSound(pVessel);
+}
+
+XRSound* XRSound::CreateInstance(const char* pUniqueModuleName)
+{
+	return new DynamicXRSound(pUniqueModuleName);
+}
 
 DynamicXRSound::DynamicXRSound(VESSEL* vessel)
 {
@@ -16,9 +25,24 @@ DynamicXRSound::DynamicXRSound(VESSEL* vessel)
 	if (xrsDLL)
 	{
 		typedef DynamicXRS_DLL* (*CreateInstance)(VESSEL*);
-		CreateInstance createInstance = reinterpret_cast<CreateInstance>(GetProcAddress(xrsDLL, "CreateInstance"));
+		CreateInstance createInstance = reinterpret_cast<CreateInstance>(GetProcAddress(xrsDLL, "CreateInstanceVessel"));
 
 		if (createInstance) xrSound = createInstance(vessel);
+	}
+}
+
+DynamicXRSound::DynamicXRSound(const char* pUniqueModuleName)
+{
+	xrSound = nullptr;
+
+	xrsDLL = LoadLibraryA(DLL_PATH);
+
+	if (xrsDLL)
+	{
+		typedef DynamicXRS_DLL* (*CreateInstance)(const char*);
+		CreateInstance createInstance = reinterpret_cast<CreateInstance>(GetProcAddress(xrsDLL, "CreateInstanceModule"));
+
+		if (createInstance) xrSound = createInstance(pUniqueModuleName);
 	}
 }
 
@@ -37,84 +61,60 @@ DynamicXRSound::~DynamicXRSound()
 
 bool DynamicXRSound::IsPresent() const 
 { 
-	if (!xrSound) return false;
-
-	return xrSound->IsPresent();
+	return xrSound ? xrSound->IsPresent() : false;
 }
 
 float DynamicXRSound::GetVersion() const 
 { 
-	if (!xrSound) return 0; 
-
-	return xrSound->GetVersion();
+	return xrSound ? xrSound->GetVersion() : 0;
 }
 
 bool DynamicXRSound::LoadWav(const int soundID, const char* pSoundFilename, const XRSound::PlaybackType playbackType)
 {
-	if (!xrSound) return false;
-
-	return xrSound->LoadWav(soundID, pSoundFilename, playbackType);
+	return xrSound ? xrSound->LoadWav(soundID, pSoundFilename, playbackType) : false;
 }
 
 bool DynamicXRSound::PlayWav(const int soundID, const bool bLoop, const float volume) 
 { 
-	if (!xrSound) return false;
-
-	return xrSound->PlayWav(soundID, bLoop, volume); 
+	return xrSound ? xrSound->PlayWav(soundID, bLoop, volume) : false;
 }
 
 bool DynamicXRSound::StopWav(const int soundID) 
 {
-	if (!xrSound) return false; 
-
-	return xrSound->StopWav(soundID);
+	return xrSound ? xrSound->StopWav(soundID) : false;
 }
 
 bool DynamicXRSound::IsWavPlaying(const int soundID) const
 {
-	if (!xrSound) return false;
-
-	return xrSound->IsWavPlaying(soundID);
+	return xrSound ? xrSound->IsWavPlaying(soundID) : false;
 }
 
 bool DynamicXRSound::SetPaused(const int soundID, const bool bPause)
 {
-	if (!xrSound) return false;
-
-	return xrSound->SetPaused(soundID, bPause);
+	return xrSound ? xrSound->SetPaused(soundID, bPause) : false;
 }
 
 bool DynamicXRSound::IsPaused(const int soundID) const
 {
-	if (!xrSound) return false;
-
-	return xrSound->IsPaused(soundID);
+	return xrSound ? xrSound->IsPaused(soundID) : false;
 }
 
 bool DynamicXRSound::SetDefaultSoundEnabled(const XRSound::DefaultSoundID soundID, const bool bEnabled)
 {
-	if (!xrSound) return false;
-
-	return xrSound->SetDefaultSoundEnabled(soundID, bEnabled);
+	return xrSound ? xrSound->SetDefaultSoundEnabled(soundID, bEnabled) : false;
 }
 
 bool DynamicXRSound::GetDefaultSoundEnabled(const XRSound::DefaultSoundID soundID) const
 {
-	if (!xrSound) return false;
-
-	return xrSound->GetDefaultSoundEnabled(soundID);
+	return xrSound ? xrSound->GetDefaultSoundEnabled(soundID) : false;
 }
 
 bool DynamicXRSound::SetDefaultSoundGroupFolder(const XRSound::DefaultSoundID defaultSoundID, const char* pSubfolderPath)
 {
-	if (!xrSound) return false;
-
-	return xrSound->SetDefaultSoundGroupFolder(defaultSoundID, pSubfolderPath);
+	return xrSound ? xrSound->SetDefaultSoundGroupFolder(defaultSoundID, pSubfolderPath) : false;
 }
 
 const char* DynamicXRSound::GetDefaultSoundGroupFolder(const XRSound::DefaultSoundID defaultSoundID) const
 {
-	if (!xrSound) return nullptr;
-
-	return xrSound->GetDefaultSoundGroupFolder(defaultSoundID);
+	return xrSound ? xrSound->GetDefaultSoundGroupFolder(defaultSoundID) : false;
 }

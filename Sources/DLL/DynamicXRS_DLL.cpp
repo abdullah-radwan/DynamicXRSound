@@ -1,6 +1,8 @@
 #include "DynamicXRS_DLL.h"
 
-DynamicXRS::DynamicXRS(VESSEL* vessel)  { xrSound = XRSound::CreateInstance(vessel); }
+DynamicXRS::DynamicXRS(VESSEL* pVessel)  { xrSound = XRSound::CreateInstance(pVessel); }
+
+DynamicXRS::DynamicXRS(const char* pUniqueModuleName) { xrSound = XRSound::CreateInstance(pUniqueModuleName); }
 
 DynamicXRS::~DynamicXRS() { delete xrSound; }
 
